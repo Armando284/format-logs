@@ -2,14 +2,20 @@
   "name": "format-logs",
   "version": "1.0.0",
   "description": "A formatter for Node.js console logs.",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "test": "jest --config jestconfig.json",
     "dev": "tsc --watch",
     "build": "tsc",
     "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
     "lintfix": "npm run lint -- --fix",
-    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\""
+    "format": "prettier --ignore-path .gitignore --write \"**/*.+(js|ts|json)\"",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm test && npm run lint",
+    "preversion": "npm run lint",
+    "version": "npm run format && git add -A src",
+    "postversion": "git push && git push --tags"
   },
   "repository": {
     "type": "git",
