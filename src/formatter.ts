@@ -6,16 +6,24 @@ type ansiId = ansiBreaker | ansiFormats | ansiFontsColors | ansiBgColors;
 type ansiCode = `\x1b[${ansiId}m`;
 type color = 'black' | 'red' | 'green' | 'yellow' | 'blue' | 'magenta' | 'cyan' | 'white';
 type style = 'bold' | 'light' | 'italic' | 'underline' | 'crossed';
-interface options {
-  color?: color;
-  bg?: color;
-  style?: style;
-}
+type types = 'title' | 'subtitle' | 'error' | 'warning' | 'info';
 
-const BREAKER: ansiBreaker = 0;
+/**
+ * Returns an ansi code from it's id.
+ * @param  {ansiId} id
+ * @returns ansiCode
+ */
 const code = (id: ansiId): ansiCode => `\x1b[${id}m`;
 
-const colorCodes = (color: color, isBg: boolean): ansiFontsColors | ansiBgColors => {
+const BREAKER: ansiCode = code(0);
+
+/**
+ * Returns the ansi id of a font or background color given it's name.
+ * @param  {color} color
+ * @param  {boolean} isBg
+ * @returns ansiCode
+ */
+const colorCodes = (color: color, isBg: boolean): ansiCode => {
   const baseId = isBg ? 40 : 30;
   const colors = {
     black: 0,
@@ -27,10 +35,15 @@ const colorCodes = (color: color, isBg: boolean): ansiFontsColors | ansiBgColors
     cyan: 6,
     white: 67,
   };
-  return (colors[color] + baseId) as ansiFontsColors | ansiBgColors;
+  return code((colors[color] + baseId) as ansiFontsColors | ansiBgColors);
 };
 
-const styleCodes = (style: style): ansiFormats => {
+/**
+ * Returns the ansi id of a text format given it's name.
+ * @param  {style} style
+ * @returns ansiCode
+ */
+const styleCodes = (style: style): ansiCode => {
   const styles = {
     bold: 1,
     light: 2,
@@ -38,14 +51,79 @@ const styleCodes = (style: style): ansiFormats => {
     underline: 4,
     crossed: 9,
   };
-  return styles[style] as ansiFormats;
+  return code(styles[style] as ansiFormats);
 };
 
-export const format = (text: string, options: options): string => {
+/**
+ * @param  {types} type
+ * @returns string
+ */
+const formatTypes =
+  (type: types) =>
+    (text: string): string => {
+      if (text === '') return '🚀';
+      const types = {
+        title: (text: string): string =>
+          `🚀 ${colorCodes('green', true)}${colorCodes('white', false)}${styleCodes(
+            'bold',
+          )} ${text.toUpperCase()} ${BREAKER}`,
+        subtitle: (text: string): string =>
+          `#️⃣ ${colorCodes('cyan', false)}${styleCodes('italic')} ${text.toUpperCase()} ${BREAKER}`,
+        error: (text: string): string =>
+          `🔴 ${colorCodes('red', true)}${colorCodes('white', false)}${styleCodes('bold')} ERROR: ${BREAKER} ${colorCodes(
+            'red',
+            false,
+          )}${styleCodes('underline')}${text}${BREAKER}`,
+        warning: (text: string): string =>
+          `🌡️  ${colorCodes('yellow', true)}${colorCodes('white', false)}${styleCodes(
+            'bold',
+          )} WARNING: ${BREAKER} ${colorCodes('yellow', false)}${text}${BREAKER}`,
+        info: (text: string): string =>
+          `👀 ${colorCodes('cyan', true)}${colorCodes('white', false)}${styleCodes('bold')} INFO: ${BREAKER} ${colorCodes(
+            'cyan',
+            false,
+          )}${text}${BREAKER}`,
+      };
+      return types[type](text);
+    };
+
+/**
+ * Formats an string with ansi codes for terminal console logs.
+ * @param  {string} text
+ * @param  {{color?:color;bg?:color;style?:style}} options?
+ * @returns string
+ */
+export const format = (text: string, options?: { color?: color; bg?: color; style?: style }): string => {
+  if (text === '') return '🚀';
+  if (options === undefined) return `🚀 ${text}`;
   const { color, bg, style } = options;
-  if (text === '') return '';
-  if (color === undefined && bg === undefined && style === undefined) return text;
-  return `${color !== undefined ? code(colorCodes(color, false)) : ''}${
-    bg !== undefined ? code(colorCodes(bg, true)) : ''
-  }${style !== undefined ? code(styleCodes(style)) : ''}${text}${code(BREAKER)}`;
+  console.log({ color, bg, style });
+  return `🚀 ${color !== undefined ? colorCodes(color, false) : ''}${bg !== undefined ? colorCodes(bg, true) : ''}${style !== undefined ? styleCodes(style) : ''
+    }${text}${BREAKER}`;
 };
+
+/**
+ * Returns a 'Title' formatted string;
+ * @param  {string} text
+ */
+export const title = formatTypes('title');
+/**
+ * Returns a 'Subtitle' formatted string;
+ * @param  {string} text
+ */
+export const subtitle = formatTypes('subtitle');
+/**
+ * Returns an 'Error' formatted string;
+ * @param  {string} text
+ */
+export const error = formatTypes('error');
+/**
+ * Returns a 'Warning' formatted string;
+ * @param  {string} text
+ */
+export const warning = formatTypes('warning');
+/**
+ * Returns an 'Info' formatted string;
+ * @param  {string} text
+ */
+export const info = formatTypes('info');
