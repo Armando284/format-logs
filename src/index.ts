@@ -1,1 +1,1 @@
-export { format, title, subtitle, error, warning, info } from './formatter';
+export { compose as custom, title, sub, err, warn, info } from './formatter';
