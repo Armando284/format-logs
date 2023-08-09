@@ -1,4 +1,28 @@
-import { custom, title, sub, err, warn, info } from '../';
+import { custom, title, sub, err, warn, info, log } from '../';
+import * as fs from 'fs';
+
+async function saveData(data = ''): Promise<void> {
+  // Note: This === symbol it's the same of 3 consecutive = symbols, 
+  //          it checks for type and value equality
+  if (data === '') {
+    throw new Error('Empty data!')
+  }
+  const content = JSON.stringify(data, null, '\t');
+  try {
+
+    /**
+     * If you want to add more than one result to your file
+     * change the writeFile function 
+     * for the appendFile function
+     */
+    //  @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-confusing-void-expression
+    await fs.writeFile('saveFile.txt', content);
+    console.log('File saved!');
+  } catch (err) {
+    console.log({ err });
+  }
+}
 
 test('Formatter on correct parameters', () => {
   const text = `${custom('Hello', 'green', 'bgYellow', 'bold')} World`;
@@ -55,4 +79,10 @@ test('Info with text', () => {
   expect(text).toEqual(
     `👀 \u001b[1m\u001b[97m\u001b[46m INFO: \u001b[0m\u001b[0m\u001b[0m \u001b[36mHello\u001b[0m World`,
   );
+});
+
+test('Formatter on builder with correct parameters', async () => {
+  const text = `${log.green.bgYellow.bold('Hello')} World`;
+  await saveData(text)
+  expect(text).toEqual('\u001b[1m\u001b[43m\u001b[32mHello\u001b[0m\u001b[0m\u001b[0m World');
 });
