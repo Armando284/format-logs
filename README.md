@@ -1,6 +1,6 @@
 # Format Logs
 
-> Simple to use formatting for terminal console logs.
+> Simple and flexible to use formatting for terminal console logs.
 
 ![examples](assets/examples.png)
 
@@ -22,6 +22,11 @@ It is also possible to easily compose complex large styles.
 
 ```javascript
 import { custom } from 'format-logs';
+
+// Using method composition
+// Creates an string with bold font, yellow background and green text color
+// All text styles can be used like this
+console.log(log.green.bgYellow.bold('Hello World'));
 
 // Creates an string with blue background, white text and bold font style.
 console.log(custom('Hello World', 'bgBlue', 'white', 'bold'));
