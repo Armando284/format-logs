@@ -1,6 +1,6 @@
 {
   "name": "format-logs",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "A formatter for Node.js console logs.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
